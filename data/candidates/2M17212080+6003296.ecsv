@@ -4,6 +4,7 @@
 # - {name: time, datatype: float64}
 # - {name: rv, unit: km / s, datatype: float32}
 # - {name: rv_err, unit: km / s, datatype: float32}
+# - {name: source, datatype: string}
 # meta: !!omap
 # - __serialized_columns__:
 #     rv:
