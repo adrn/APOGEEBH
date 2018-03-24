@@ -9,3 +9,4 @@ prior:
   num_cache: 536870912
 emcee:
   n_walkers: 1024
+  n_steps: 16384
