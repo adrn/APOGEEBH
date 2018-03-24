@@ -120,8 +120,6 @@ def main(data_path, config_file, data_file_ext, pool, seed, overwrite=False):
             logger.debug("...done with star {} ({:.2f} seconds)"
                          .format(basename, time.time() - t0))
 
-        break
-
         with h5py.File(joker_results_filename) as f:
             joker_samples = JokerSamples(f)
 
