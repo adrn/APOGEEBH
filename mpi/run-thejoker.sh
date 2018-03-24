@@ -2,7 +2,7 @@
 #SBATCH -J apogeebh          # job name
 #SBATCH -o apogeebh.o%j             # output file name (%j expands to jobID)
 #SBATCH -e apogeebh.e%j             # error file name (%j expands to jobID)
-#SBATCH -n 448
+#SBATCH -n 224
 #SBATCH -t 12:00:00             # run time (hh:mm:ss) - 1.5 hours
 #SBATCH --mail-user=adrn@princeton.edu
 #SBATCH --mail-type=begin       # email me when the job starts
