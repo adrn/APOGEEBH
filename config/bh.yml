@@ -1,0 +1,11 @@
+name: bh
+hyperparams:
+  P_min: 1 day
+  P_max: 8192 day
+  jitter_prior_mean: 9.5 # See infer-jitter notebook in TwoFace
+  jitter_prior_stddev: 1.64
+  jitter_prior_unit: m/s
+prior:
+  num_cache: 1000000
+emcee:
+  n_walkers: 1024
