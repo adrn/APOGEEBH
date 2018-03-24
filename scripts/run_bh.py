@@ -7,6 +7,7 @@ specified directory.
 import glob
 from os import path
 import os
+import pickle
 import sys
 import time
 
@@ -24,6 +25,8 @@ import yaml
 from twoface.log import log as logger
 from twoface.sample_prior import make_prior_cache
 from twoface.util import config_to_jokerparams
+from twoface.samples_analysis import unimodal_P, MAP_sample
+
 
 def main(data_path, config_file, data_file_ext, pool, seed, overwrite=False):
     # parse config file
@@ -54,6 +57,7 @@ def main(data_path, config_file, data_file_ext, pool, seed, overwrite=False):
                          nsamples=n_prior_samples)
         logger.debug("...done")
 
+    mcmc_model_filename = path.join(cache_path, 'model.pickle')
     data_files = glob.glob(path.join(data_path, '*.{0}'.format(data_file_ext)))
 
     for filename in data_files:
@@ -64,6 +68,8 @@ def main(data_path, config_file, data_file_ext, pool, seed, overwrite=False):
                                            '{0}-joker.hdf5'.format(basename))
         mcmc_results_filename = path.join(cache_path,
                                           '{0}-mcmc.hdf5'.format(basename))
+        mcmc_chain_filename = path.join(cache_path,
+                                        '{0}-chain.npy'.format(basename))
 
         data_tbl = QTable.read(filename)
         data = RVData(t=data_tbl['time'], rv=data_tbl['rv'],
@@ -95,18 +101,6 @@ def main(data_path, config_file, data_file_ext, pool, seed, overwrite=False):
                          .format(time.time() - t0))
             logger.debug("...done with star {} ({:.2f} seconds)"
                          .format(basename, time.time() - t0))
-
-        with h5py.File(joker_results_filename) as f:
-            joker_samples = JokerSamples(f)
-
-        # TODO: need to do this part, but can do this while the above is running!
-        # if not path.exists(mcmc_results_filename) or overwrite:
-        #     # TODO: check if samples are unimodal!
-        #     model, samples, sampler = joker.mcmc_sample(data, joker_samples,
-        #                                                 n_burn=0,
-        #                                                 n_steps=16384,
-        #                                                 n_walkers=n_walkers,
-        #                                                 return_sampler=True)
 
     pool.close()
     sys.exit(0)
