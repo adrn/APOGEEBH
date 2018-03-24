@@ -16,6 +16,6 @@ source activate twoface
 
 date
 
-srun python run_bh.py -v -c ../config/bh.yml  --mpi
+srun python run_bh.py -v -c ../config/bh.yml  --mpi --data-path=../data/candidates/ --ext=ecsv
 
 date
