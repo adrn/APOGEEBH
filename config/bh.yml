@@ -6,6 +6,6 @@ hyperparams:
   jitter_prior_stddev: 1.64
   jitter_prior_unit: m/s
 prior:
-  num_cache: 1000000
+  num_cache: 536870912
 emcee:
   n_walkers: 1024
