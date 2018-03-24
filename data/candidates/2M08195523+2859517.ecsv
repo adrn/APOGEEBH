@@ -1,0 +1,29 @@
+# %ECSV 0.9
+# ---
+# datatype:
+# - {name: time, datatype: float64}
+# - {name: rv, unit: km / s, datatype: float32}
+# - {name: rv_err, unit: km / s, datatype: float32}
+# meta: !!omap
+# - __serialized_columns__:
+#     rv:
+#       __class__: astropy.units.quantity.Quantity
+#       value: !astropy.table.SerializedColumn {name: rv}
+#     rv_err:
+#       __class__: astropy.units.quantity.Quantity
+#       value: !astropy.table.SerializedColumn {name: rv_err}
+#     time:
+#       __class__: astropy.time.core.Time
+#       format: mjd
+#       in_subfmt: '*'
+#       out_subfmt: '*'
+#       precision: 3
+#       scale: tcb
+#       value: !astropy.table.SerializedColumn {name: time}
+# schema: astropy-2.0
+time rv rv_err
+56267.5151711 -20.1181 0.0310235
+56312.3345918 -28.8399 0.0212462
+56316.3823718 -45.7825 0.0228406
+57476.1695614 14.492 0.0269614
+57481.1710715 -11.67 0.0414963
