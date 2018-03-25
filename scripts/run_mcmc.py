@@ -130,7 +130,7 @@ def main(data_path, apogee_id, config, data_file_ext, pool, overwrite=False):
                 g.create_dataset(name='gelman_rubin', data=Rs)
 
                 # take the last sample, downsample
-                end_pos = chain[:, n_steps // 2::1024].T
+                end_pos = chain[:, n_steps // 2::1024].reshape(-1, n_pars)
                 samples = model.unpack_samples_mcmc(end_pos)
                 samples.to_hdf5(f)
 
