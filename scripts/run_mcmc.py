@@ -66,11 +66,11 @@ def main(data_path, apogee_id, config, data_file_ext, pool, overwrite=False):
     with h5py.File(joker_results_filename) as f:
         joker_samples = JokerSamples.from_hdf5(f)
 
+    model = TheJokerMCMCModel(joker_params=joker_params, data=data)
+
     if not path.exists(mcmc_chain_filename) or overwrite:
         joker = TheJoker(joker_params)
         joker.params.jitter = (8.5, 0.9) # HACK!
-
-        model = TheJokerMCMCModel(joker_params=joker_params, data=data)
 
         if unimodal_P(joker_samples, data):
             logger.debug("Samples are unimodal. Preparing to run MCMC...")
@@ -117,22 +117,22 @@ def main(data_path, apogee_id, config, data_file_ext, pool, overwrite=False):
             return
 
     if not path.exists(mcmc_results_filename) or overwrite:
+        chain = np.load(mcmc_chain_filename)
         with h5py.File(mcmc_results_filename) as f:
             chain = np.load(mcmc_chain_filename)
             n_walkers, n_steps, n_pars = chain.shape
 
-            g = f.create_group(apogee_id)
+            logger.debug('Adding star {0} to MCMC cache'.format(apogee_id))
 
-            logger.debug('Adding star {0} to MCMC cache'.format(star.apogee_id))
             try:
-                g2 = g.create_group('chain-stats')
-                Rs = gelman_rubin(chain[:, n_steps//2:])
-                g2.create_dataset(name='gelman_rubin', data=Rs)
+                g = f.create_group('chain-stats')
+                Rs = gelman_rubin(chain[:, n_steps // 2:])
+                g.create_dataset(name='gelman_rubin', data=Rs)
 
                 # take the last sample, downsample
-                end_pos = chain[:run.requested_samples_per_star, -1]
+                end_pos = chain[:, n_steps // 2::1024].T
                 samples = model.unpack_samples_mcmc(end_pos)
-                samples.to_hdf5(g)
+                samples.to_hdf5(f)
 
             except Exception as e:
                 raise
