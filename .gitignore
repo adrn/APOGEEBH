@@ -1,2 +1,5 @@
 data/candidates/cache
 plots
+*~
+*.e*
+*.o*
