@@ -28,6 +28,7 @@ from twoface.log import log as logger
 from twoface.sample_prior import make_prior_cache
 from twoface.util import config_to_jokerparams
 from twoface.samples_analysis import unimodal_P, MAP_sample
+from twoface.mcmc_helpers import gelman_rubin
 
 
 global data, joker_params
