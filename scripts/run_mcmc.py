@@ -50,8 +50,7 @@ def main(data_path, apogee_id, config, data_file_ext, pool, overwrite=False):
     joker = TheJoker(joker_params, random_state=rnd, pool=pool)
 
     n_walkers = config['emcee']['n_walkers']
-    # n_steps = config['emcee']['n_steps']
-    n_steps = 32
+    n_steps = config['emcee']['n_steps']
 
     mcmc_model_filename = path.join(cache_path, 'model.pickle')
 
@@ -95,7 +94,7 @@ def main(data_path, apogee_id, config, data_file_ext, pool, overwrite=False):
             p0 = model.to_mcmc_params(p0.T).T
 
             n_dim = p0.shape[1]
-            sampler = emcee.EnsembleSampler(n_walkers, n_dim, model,
+            sampler = emcee.EnsembleSampler(n_walkers, n_dim, logprob,
                                             pool=pool)
 
             logger.debug('Running MCMC for {0} steps...'.format(n_steps))
