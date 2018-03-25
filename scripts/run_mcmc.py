@@ -65,7 +65,7 @@ def main(data_path, apogee_id, config, data_file_ext, pool, overwrite=False):
     with h5py.File(joker_results_filename) as f:
         joker_samples = JokerSamples.from_hdf5(f)
 
-    if not path.exists(mcmc_results_filename) or overwrite:
+    if not path.exists(mcmc_chain_filename) or overwrite:
         joker = TheJoker(joker_params)
         joker.params.jitter = (8.5, 0.9) # HACK!
 
@@ -113,9 +113,31 @@ def main(data_path, apogee_id, config, data_file_ext, pool, overwrite=False):
 
         else:
             logger.error("Samples are multimodal!")
+            return
 
-    pool.close()
-    sys.exit(0)
+    if not path.exists(mcmc_results_filename) or overwrite:
+        with h5py.File(mcmc_results_filename) as f:
+            chain = np.load(mcmc_chain_filename)
+            n_walkers, n_steps, n_pars = chain.shape
+
+            g = f.create_group(apogee_id)
+
+            logger.debug('Adding star {0} to MCMC cache'.format(star.apogee_id))
+            try:
+                g2 = g.create_group('chain-stats')
+                Rs = gelman_rubin(chain[:, n_steps//2:])
+                g2.create_dataset(name='gelman_rubin', data=Rs)
+
+                # take the last sample, downsample
+                end_pos = chain[:run.requested_samples_per_star, -1]
+                samples = model.unpack_samples_mcmc(end_pos)
+                samples.to_hdf5(g)
+
+            except Exception as e:
+                raise
+
+            finally:
+                del g
 
 
 if __name__ == "__main__":
@@ -193,3 +215,6 @@ if __name__ == "__main__":
          apogee_id=args.apogee_id,
          config=config, overwrite=args.overwrite,
          data_file_ext=args.data_file_ext)
+
+    pool.close()
+    sys.exit(0)
