@@ -67,18 +67,18 @@ def main(pool, seed, overwrite=False, _continue=False):
 
     # Query to get all stars associated with this run that need processing:
     # they should have a status id = 0 (needs processing)
-    star_query = session.query(AllStar).join(StarResult, Status)\
-                                       .filter(Status.id == 0)\
-                                       .filter(~AllStar.apogee_id.in_(done_subq))
+    star_query = session.query(AllStar)\
+                        .filter(AllStar.vscatter >= 5.)\
+                        .filter(~AllStar.apogee_id.in_(done_subq))
 
     # Base query to get a StarResult for a given Star so we can update the
     # status, etc.
     result_query = session.query(StarResult).join(AllStar)\
-                                            .filter(Status.id == 0)\
-                                            .filter(~AllStar.apogee_id.in_(done_subq))
+                          .filter(Status.id == 0)\
+                          .filter(~AllStar.apogee_id.in_(done_subq))
 
     n_stars = star_query.count()
-    logger.info("{0} stars left to process")
+    logger.info("{0} stars left to process".format(n_stars))
 
     # Ensure that the results file exists - this is where we cache samples that
     # pass the rejection sampling step
@@ -99,11 +99,14 @@ def main(pool, seed, overwrite=False, _continue=False):
         if result_query.filter(AllStar.apogee_id == star.apogee_id).count() < 1:
             logger.debug('Star {0} has no result object!'
                          .format(star.apogee_id))
-            continue
+            result = StarResult()
+            star.result = result
+            session.add(result)
+            session.commit()
 
-        # Retrieve existing StarResult from database. We limit(1) because the
-        # APOGEE_ID isn't unique, but we attach all visits for a given star to
-        # all rows, so grabbing one of them is fine.
+        # Retrieve existing StarResult from database. We limit(1) because
+        # the APOGEE_ID isn't unique, but we attach all visits for a given
+        # star to all rows, so grabbing one of them is fine.
         result = result_query.filter(AllStar.apogee_id == star.apogee_id)\
                              .limit(1).one()
 
