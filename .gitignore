@@ -1,6 +1,6 @@
-data/candidates/cache
 plots
 *~
-*.e*
-*.o*
+mpi/*.e*
+mpi/*.o*
 cache
+notebooks
